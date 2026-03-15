@@ -1,0 +1,10 @@
+{
+  "name": "quant-kb",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Agent-first quantitative knowledge base with MCP access.",
+  "scripts": {
+    "test": "node --test"
+  }
+}
