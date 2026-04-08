@@ -1,0 +1,37 @@
+[
+  {
+    "title": "广发证券投资者关系-公司公告",
+    "category": "source_portal",
+    "source": "广发证券官网投资者关系",
+    "url": "https://ir.gf.com.cn/cn/information/company-announcement",
+    "note": "官方公告入口，当前检索结果更偏公告/债券文件，暂未定位到公开策略研报专页。"
+  },
+  {
+    "title": "广发证券投资者关系-业绩报告",
+    "category": "source_portal",
+    "source": "广发证券官网投资者关系",
+    "url": "https://ir.gf.com.cn/cn/report/performance-report",
+    "note": "财务与定期报告入口，可作为机构研究背景资料补充。"
+  },
+  {
+    "title": "广发证券英文投资者关系-业绩报告",
+    "category": "source_portal",
+    "source": "广发证券官网投资者关系",
+    "url": "https://ir.gf.com.cn/en/report/performance-report",
+    "note": "英文版业绩报告入口。"
+  },
+  {
+    "title": "微信公众号公开文章候选链接 1",
+    "category": "candidate_link",
+    "source": "微信公众平台",
+    "url": "https://mp.weixin.qq.com/s/3fyTOK0q9EtjAfFQuCdcsQ",
+    "note": "需后续人工或浏览器进一步确认具体内容。"
+  },
+  {
+    "title": "微信公众号公开文章候选链接 2",
+    "category": "candidate_link",
+    "source": "微信公众平台",
+    "url": "https://mp.weixin.qq.com/s/MX2Vr9CVDeA3WbiX69lZBw",
+    "note": "需后续人工或浏览器进一步确认具体内容。"
+  }
+]
