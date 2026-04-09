@@ -1,11 +1,10 @@
 # QUANT
 
-This repo is a personal quant knowledge base + executable sandbox.
+This repo is a personal quant sandbox for code, scripts, and docs. Consolidated KB content now lives at `F:/QuantKB/`.
 
 ## What goes where
 
-- `kb/`        : curated notes (stable, referenced)
-- `research/`  : rough experiments / scratchpads (may be messy)
+- `research/`  : rough experiments / scratchpads (promote stable KB-style notes to `F:/QuantKB/`)
 - `strategies/`: strategy specs (idea -> assumptions -> implementation notes)
 - `indicators/`: indicator definitions + implementations
 - `backtest/`  : backtest runners / adapters / examples
@@ -25,7 +24,7 @@ This repo is a personal quant knowledge base + executable sandbox.
 ### Node/TS
 
 - Install deps: `npm install`
-- Run a script: `npm run kb:index`
+- Run tests: `npm test`
 
 ### Python
 
@@ -34,5 +33,5 @@ This repo is a personal quant knowledge base + executable sandbox.
 
 ## Index
 
-- `kb/index.md`
+- `F:/QuantKB/`
 - `docs/GLOSSARY.md`

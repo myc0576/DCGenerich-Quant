@@ -5,7 +5,6 @@
   "type": "module",
   "description": "Agent-first quantitative knowledge base with MCP access.",
   "scripts": {
-    "kb:index": "node scripts/kb-index.mjs",
     "test": "node --test"
   }
 }

@@ -1,3 +1,3 @@
 # Research
 
-Scratchpad area. Keep experiments here until they stabilize, then promote to `kb/`.
+Scratchpad area. Keep experiments here until they stabilize, then promote KB-style notes to `F:/QuantKB/`.
