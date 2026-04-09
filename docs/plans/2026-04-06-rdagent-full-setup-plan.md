@@ -1,4 +1,4 @@
-# RDAgent Full Setup Execution Plan
+﻿# RDAgent Full Setup Execution Plan
 
 ## Goal
 
@@ -310,6 +310,10 @@
 - 2026-04-07: 用户已明确选择路线 2（升级 GPU Docker runtime 而非默认 CPU fallback）；live plan 已据此插入 GPU 兼容性诊断、镜像升级与 smoke 复跑三个新关键任务。
 - 2026-04-07: 已完成一次最小本地 GPU 探针复验：当前 `local_qlib` 容器内 `torch 2.2.1 / cuda 12.1`、`torch.cuda.get_arch_list()` 仅到 `sm_90`，在 `RTX 5070 Laptop GPU` 上执行最小 CUDA tensor 时稳定复现 `no kernel image is available for execution on the device`。
 
+- 2026-04-09: 已固化正式 loop 前的 canonical WSL 验证命令：PYTHONPATH=. /home/hp/miniconda3/bin/conda run -n rdagent python -m pytest ...；pytest / coverage 已安装进 WSL dagent env。
+- 2026-04-09: 已补齐 model/quant entrypoint bootstrap、model template merged/all-market 合同，以及 dataset window / feature coverage / backtest contract 三组 readiness 测试。
+- 2026-04-09: 已创建 evolution logs、strategy candidate schema、promotion gate、data resilience runbook 和 research-report sidecar demotion 文档。
+
 ## Surprises
 
 - 2026-04-08: `cn_data_merged` 并不缺 benchmark 数据，缺的是正确的 symbol。provider 中实际存在的是 `SZ000852`，而 runtime 默认值长期写成了 `SH000852`，这使得“benchmark 数据缺失”的早期结论全部失效。
@@ -333,6 +337,9 @@
 - `fin_quant` 在修复初始化 blocker 后进入了更深层的 Qlib dataset 装载逻辑，但在 `cn_data_merged` 上报出 `instrument ... does not contain data for day`；说明 merged provider / instruments / freq 仍有一致性问题。
 - smoke runtime 已能稳定看到 GPU，但“看得到 GPU”和“能在该 GPU 上完成训练”是两个不同 gate。
 - 官方/社区的态度比预期更“底层”：RD-Agent/Qlib 默认允许 GPU，但真正的显卡架构兼容性完全由 PyTorch/CUDA 二进制组合决定，项目自身并不会兜底。
+
+- 2026-04-09: QTDockerEnv 的默认 QlibDockerConf() 对象会跨调用残留 timeout 状态；代码已改为每次实例化 fresh conf，避免 smoke gate 被共享状态污染。
+- 2026-04-09: 正式 20+ loop 之前，优先把前置拆成两类：已完成的验证/文档/结构项，与尚未关闭的 `fin_model` timeout gate、`fin_quant` running gate。
 
 ## Decision Log
 
@@ -402,17 +409,22 @@
 | Codex sandbox 拥有 D:/F: 盘读写权限 | Completed | Task 0 — ACL 已授权，`danger-full-access` 已启用，D: 读/写 + F: 读 验证通过 |
 | Codex sandbox 拥有 WSL 路径读写权限 | ⚠️ N/A | WSL 9p 文件系统不支持 Windows ACL，需替代方案 |
 
+
+| 正式 loop 前 canonical WSL pytest 入口 | Completed | `/home/hp/miniconda3/bin/conda run -n rdagent python -m pytest ...` 已在 `test_model_env_config.py` 上复验；README 已写明命令形状 |
+| model/quant bootstrap parity | Completed | `test_model_entrypoint_bootstrap.py`、`test_quant_entrypoint_bootstrap.py` 通过；`model.py` / `quant.py` 已补 `_script_bootstrap` + `.env` 加载 |
+| merged-data data QA / leakage / backtest contracts | Completed | `test_dataset_window_leakage.py`、`test_feature_coverage_contract.py`、`test_backtest_contract.py` 全部通过 |
+| deep-loop / promotion / resilience docs | Completed | 已创建 evolution logs、`rdagent_best_strategy.md`、`data_resilience_runbook.md`、`research_report_sources.md` |
 ## Outcome / Handoff
 
 - **2026-04-08 Review Summary:** Phase 4.5 已关闭。CSI instruments 日期越界已修复并补防回归测试；runtime 时间窗口已明确为 `.env` 驱动、`conf.py` 仅作默认参考；RD-Agent 当前实验状态已完成 snapshot freeze。
-- **当前 Critical Path:** Task 15 → Task 16
+- **当前 Critical Path:** `fin_model` timeout gate -> `fin_quant` running gate
 - **当前新 blocker / gate:** `fin_model` 已进入真实 CUDA 训练，但在 600 秒 `running_timeout_period` 上被 kill；`fin_quant` 这轮仍停在 coding 阶段，尚未形成可用于 launch-gate 评估的 running evidence。
 - **下一步修复路径:** (A) 为 model smoke 单独定义 timeout gate（提高 `running_timeout_period` 或降低模型/训练预算），补齐 `fin_model` success-path；(B) 为 quant smoke 增加“coding 耗时上限/复用已生成 workspace”的控制，确保其进入 running 再判断是否存在独立 runtime blocker。
 - **架构建议汇总:**
   1. F: 外置 USB 盘是数据单点故障，建议 cn_data_merged 做一次备份
   2. RD-Agent 22 个未提交改动需要 snapshot commit
   3. `strategies/` 目录为空，deep loop 产出需要明确的输出路径
-  4. Phase 5-6 所有前置文件均不存在，需要在 Task 14 的新 launch gate（timeout / long-coding）收敛后再逐步建立
+  4. Phase 5-6 前置文档与目录已建立，但还缺新的 model/quant 运行证据来触发正式 deep loop
 
 - Task 14 is partially complete: the Docker/PyTorch GPU blocker and merged-provider/day access blocker are both closed. `fin_model` has advanced to real CUDA training and now fails on timeout; `fin_quant` still needs a bounded rerun that reaches running.
 - Task 13 is complete: the rebuilt `local_qlib:latest` now reports `torch 2.7.1+cu128`, includes `sm_120` in `arch_list`, executes a real CUDA tensor op on the RTX 5070 Laptop GPU, and still imports `qlib` plus the extra Python packages installed by the Dockerfile.
@@ -431,3 +443,5 @@
   3. 按 Task 14 复跑 `fin_model` / `fin_quant`，把 GPU 问题与 provider/day 问题彻底拆开。
   4. 现在应把 Task 15-16 改写为 timeout / long-coding launch gates，而不是继续围绕 provider/day 诊断。
   5. 在 `fin_model` timeout gate 与 `fin_quant` running evidence 补齐前，不启动 20+ loop。
+
+
